@@ -1,0 +1,50 @@
+#!/usr/bin/env python
+##
+## Name:     maildumper
+## Purpose:  Dump a stream of words from a e-mail message.
+##
+## Copyright (C) 2008 Michael J. Fromberger, All Rights Reserved.
+##
+import sys
+from Classifier import (split_mail, make_seekable)
+from email import message_from_file
+
+
+def openpath(path):
+    if path == '-':
+        return make_seekable(sys.stdin)
+    else:
+        return open(path, 'rU')
+
+
+def main(args):
+    """Command-line driver.
+
+    Usage:  maildumper input-file*
+
+    If no input file is specified, standard input is consumed.  Results are
+    written to standard output.
+    """
+    ofp = sys.stdout
+    if len(args) == 0:
+        args = ['-']
+
+    used_stdin = False
+    nerrs = 0
+    for path in args:
+        try:
+            with openpath(path) as ifp:
+                msg = message_from_file(ifp)
+                for word in split_mail(msg):
+                    print word
+        except (IOError, OSError), e:
+            print >> sys.stderr, "Error opening '%s': %s" % (path, e)
+            nerrs += 1
+
+    return nerrs
+
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv[1:]))
+
+# Here there be dragons

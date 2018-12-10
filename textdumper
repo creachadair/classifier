@@ -1,0 +1,44 @@
+#!/usr/bin/env python
+##
+## Name:     textdumper
+## Purpose:  Extract the words from an arbitrary text file.
+##
+## Copyright (C) 2008 Michael J. Fromberger, All Rights Reserved.
+##
+
+from __future__ import print_function
+
+import os, sys
+from Classifier import remove_stopwords, make_seekable
+from Classifier.textparsers import (word_split, limit_length, lowercase,
+                                    compose)
+
+split_input = compose(word_split, limit_length(128), lowercase,
+                      remove_stopwords)
+
+
+def main(argv):
+    """Command-line driver."""
+
+    ofp = sys.stdout
+    if len(argv) > 0:
+        try:
+            ifp = file(argv[0], 'rU')
+        except (IOError, OSError), e:
+            print("Error opening '%s': %s" % (argv[0], e), file=sys.stderr)
+            return 1
+    else:
+        ifp = make_seekable(sys.stdin)
+
+    for word in split_input(ifp.read()):
+        print(word)
+
+    ifp.close()
+    ofp.close()
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv[1:]))
+
+# Here there be dragons

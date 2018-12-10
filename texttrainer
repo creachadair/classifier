@@ -1,0 +1,99 @@
+#!/usr/bin/env python
+##
+## Name:     texttrainer
+## Purpose:  Command-line tool to train classifier on text documents.
+##
+## Copyright (C) 2008 Michael J. Fromberger, All Rights Reserved.
+##
+
+import getopt, os, re, sys, textwrap
+from Classifier import hmm_classifier, remove_stopwords
+from Classifier.textparsers import *
+
+# Location of the classification database
+db_path = os.getenv('TEXTDB_PATH', 'text.db')
+
+
+def usage(long=False):
+    print >> sys.stderr, "Usage: texttrainer [options] groups [input-file*]"
+    if not long:
+        print >> sys.stderr, "  [use -h/--help for command options]"
+    else:
+        print >> sys.stderr, textwrap.dedent('''
+        Specify one or more group names separated by commas.
+        
+        Options include:
+        -d/--database <path>   - specify location of database.
+        -h/--help              - display this help message.
+        -n/--nocount           - do not modify document count.
+        -t/--train             - upregulate message contents.
+        -u/--untrain           - downregulate message contents.
+
+        Database path:  %s
+        ''' % os.path.expanduser(db_path))
+
+
+split_input = compose(word_split, limit_length(128), lowercase,
+                      remove_stopwords)
+
+
+def main(argv):
+    """Command-line driver."""
+    global db_path
+
+    try:
+        opts, args = getopt.gnu_getopt(
+            argv, 'd:hntu',
+            ('database=', 'help', 'nocount', 'train', 'untrain'))
+    except getopt.GetoptError, e:
+        usage(False)
+        return 1
+
+    action = 'train'  # what to do:  train/untrain
+    adjust = True  # adjust document counts?
+    for opt, arg in opts:
+        if opt in ('-d', '--database'):
+            db_path = arg
+        elif opt in ('-h', '--help'):
+            usage(True)
+            return 0
+        elif opt in ('-t', '--train'):
+            action = 'train'
+        elif opt in ('-u', '--untrain'):
+            action = 'untrain'
+        elif opt in ('-n', '--nocount'):
+            adjust = False
+
+    if len(args) == 0:
+        print >> sys.stderr, "Error:  no group tags specified"
+        usage(False)
+        return 1
+
+    tags = re.split(r',\s*', args[0].strip())
+    if len(args) > 1:
+        try:
+            ifp = file(args[-1], 'rU')
+        except (IOError, OSError), e:
+            print >> sys.stderr, "Error opening '%s':\n -- %s" % (args[-1], e)
+            return 1
+    else:
+        ifp = make_seekable(sys.stdin)
+
+    cls = hmm_classifier(os.path.expanduser(db_path))
+    for tag in tags:
+        cls.add_group(tag)
+
+    msg = aggregator(split_input(ifp.read()))
+    if action == 'train':
+        cls.train(msg, tags, adjust)
+    else:
+        cls.untrain(msg, tags, adjust)
+
+    cls.close()
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv[1:]))
+
+# Here there be dragons
