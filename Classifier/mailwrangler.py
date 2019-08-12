@@ -37,9 +37,9 @@ class html_stripper(sgmllib.SGMLParser):
     """
     machine_tags = set(('script', 'style'))
     entity_or_charref = re.compile(
-        ur'&(?:'
-        ur'([a-zA-Z][-.a-zA-Z0-9]*)|#([0-9]+)'
-        ur')(;?)', re.UNICODE)
+        r'&(?:'
+        r'([a-zA-Z][-.a-zA-Z0-9]*)|#([0-9]+)'
+        r')(;?)', re.UNICODE)
 
     # Replace the SGML definitions with the HTML version.
     entitydefs = dict((k, v.decode('latin1'))
@@ -109,7 +109,7 @@ class html_stripper(sgmllib.SGMLParser):
         # this purpose.
         try:
             sgmllib.SGMLParser.parse_declaration(self, i)
-        except sgmllib.SGMLParseError, e:
+        except sgmllib.SGMLParseError as e:
             if re.match(r"unexpected u?'<' char", e.args[0]):
                 j = i + 2
                 while self.rawdata[j] != '<':
@@ -187,7 +187,7 @@ def split_mail(msg, fail_on_empty=False):
 
     found = 0
     for part in msg.walk():
-        if part.get_content_maintype() <> 'text':
+        if part.get_content_maintype() != 'text':
             continue  # skip non-text parts
 
         enc = part.get('content-transfer-encoding')

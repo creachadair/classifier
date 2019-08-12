@@ -206,7 +206,7 @@ class groupdata(object):
             if not tabs:
                 cur.executescript(db_schema)
                 self._db.commit()
-            elif tabs <> set(('Classes', 'Words', 'Data', 'Settings')):
+            elif tabs != set(('Classes', 'Words', 'Data', 'Settings')):
                 ok = False
         finally:
             cur.close()
