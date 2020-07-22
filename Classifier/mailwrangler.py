@@ -241,7 +241,6 @@ def crush_urls(input):
     """A sequence filter to flatten URL's by dropping query and
     fragment components.
     """
-
     def crush(elt):
         if elt.startswith('http:'):
             u = list(urlparse.urlparse(elt, allow_fragments=False))

@@ -155,7 +155,6 @@ class groupdata(object):
     stores data for one or more groups, which are indexed by string
     keys.
     """
-
     def __init__(self, db_path):
         """Connect to an existing database or create a new database."""
         self._db = sql.connect(db_path)

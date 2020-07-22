@@ -20,7 +20,6 @@ def unfold_entities(text):
     to the extent possible.  Unknown entities are left intact.  The
     result is still plain text.
     """
-
     def esub(match):
         t = match.group(1)
         if t.startswith('#'):
@@ -99,7 +98,6 @@ def select(pred, *args):
     predicate is given an element of the original sequence, plus the
     specified args, if any.
     """
-
     def selector(input):
         for elt in input:
             if pred(elt):
@@ -114,7 +112,6 @@ def transform(func, *args):
     given an element of the original sequence, plus the specified
     args, if any.
     """
-
     def mapping(input):
         for elt in input:
             yield func(elt, *args)
@@ -127,7 +124,6 @@ def project(pos):
     only the element at position pos of each.  Pos may be a slice,
     in which case the results will still be sequences.
     """
-
     def projector(input):
         for elt in input:
             yield elt[pos]
@@ -142,7 +138,6 @@ def partition(pred, *args):
     = True; others receive p = False.  The predicate is called with
     one element of the sequence, and any args provided.
     """
-
     def partitioner(input):
         for elt in input:
             p = pred(elt, *args)
@@ -176,7 +171,6 @@ def compose(*ts):
     transformations in the order given.  If no transformations are
     given, it is equivalent in effect to the identity transform.
     """
-
     def compose2(t1, t2):
         def composite(input):
             return t2(t1(input))
@@ -190,7 +184,6 @@ def take(num):
     """Produce a sequence containing up to num elements from the head
     of the input sequence and no more.
     """
-
     def taker(input):
         p = num
         for elt in input:
@@ -207,7 +200,6 @@ def drop(num):
     """Produce a sequence with the same elements as the input sequence,
     but omitting the first num elements.
     """
-
     def dropper(input):
         p = num
         for elt in input:
@@ -225,7 +217,6 @@ def takewhile(pred, *args):
     those following are discarded.  The filter predicate is passed an
     element of the input sequence plus extra arguments, if provided.
     """
-
     def taker(input):
         for elt in input:
             if pred(elt, *args):
@@ -241,7 +232,6 @@ def dropwhile(pred, *args):
     then include all the remaining elements of the input including the
     first element for which the predicate gave false.
     """
-
     def dropper(input):
         for elt in input:
             if not pred(elt, *args):
@@ -277,7 +267,6 @@ class aggregator(object):
     sequence of tuples of the form (word, count).  This object behaves
     like an iterable sequence type in most respects.
     """
-
     def __init__(self, source, collapse=False):
         """Initialize the aggregator with a source of tokens."""
         word_map = {}

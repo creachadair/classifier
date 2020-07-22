@@ -25,7 +25,6 @@ class classifier(classdata.groupdata):
     .classify()  -- called by the user to compute a complete classification.
     .result()    -- return result of last classification.
     """
-
     def start(self, *args):
         pass
 
@@ -50,7 +49,6 @@ class classifier(classdata.groupdata):
 
 class trainer(classdata.groupdata):
     """Updates a training set based on new input documents."""
-
     def increment_doc_count(self):
         """Add 1 to the overall document count for the training
         set.
@@ -129,7 +127,6 @@ class hmm_classifier(classifier, trainer):
     treats novel features as having a small but nonzero probability of
     occurring in any class in which they are not represented.
     """
-
     def __init__(self, db_path, feat_th=D('0.1'), feat_min=15, eps=D('0.01')):
         """Initializes a new HMM classifier.
 
